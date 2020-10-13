@@ -41,8 +41,8 @@ export const PostFilter = (props: PostFilterProps) => {
     })
   })
 
-  const viewExists = options.filter((x) => x.value === props.activeView).length > 0
-  const activeView = viewExists ? props.activeView : "trending"
+  const viewExists = options.filter(x => x.value === props.activeView).length > 0;
+  const activeView = viewExists ? props.activeView : "most-wanted";
 
   return (
     <div>
