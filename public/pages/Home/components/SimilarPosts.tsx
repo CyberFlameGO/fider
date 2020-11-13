@@ -6,9 +6,10 @@ import { actions } from "@fider/services"
 import { FaRegLightbulb } from "react-icons/fa"
 
 interface SimilarPostsProps {
-  title: string
-  tags: Tag[]
-  user?: CurrentUser
+  title: string;
+  tags: Tag[];
+  className?: string;
+  user?: CurrentUser;
 }
 
 interface SimilarPostsState {
@@ -58,14 +59,21 @@ export class SimilarPosts extends React.Component<SimilarPostsProps, SimilarPost
 
   public render() {
     return (
-      <>
-        <Heading title="Similar posts" subtitle="Consider voting on existing posts instead." icon={FaRegLightbulb} size="small" dividing={true} />
+      <div className={this.props.className || ""}>
+        <Heading
+          title="Similar posts"
+          subtitle="Consider voting on existing posts instead."
+          icon={FaRegLightbulb}
+          size="small"
+          dividing={true}
+        />
         {this.state.loading ? (
           <Loader />
         ) : (
           <ListPosts posts={this.state.posts} tags={this.props.tags} emptyText={`No similar posts matched '${this.props.title}'.`} />
         )}
-      </>
-    )
+
+      </div>
+    );
   }
 }
