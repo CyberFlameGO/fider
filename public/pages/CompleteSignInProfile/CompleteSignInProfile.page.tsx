@@ -6,8 +6,9 @@ import { Modal, Button, Form, Input, LegalFooter } from "@fider/components"
 import { actions, Failure, querystring, Fider } from "@fider/services"
 
 interface CompleteSignInProfilePageState {
-  name: string
-  error?: Failure
+  name: string;
+  nameIsValid: boolean;
+  error?: Failure;
 }
 
 export default class CompleteSignInProfilePage extends React.Component<HomePageProps, CompleteSignInProfilePageState> {
@@ -18,7 +19,8 @@ export default class CompleteSignInProfilePage extends React.Component<HomePageP
     this.key = querystring.get("k")
     this.state = {
       name: "",
-    }
+      nameIsValid: false
+    };
   }
 
   private submit = async () => {
@@ -31,8 +33,10 @@ export default class CompleteSignInProfilePage extends React.Component<HomePageP
   }
 
   private setName = (name: string) => {
-    this.setState({ name })
-  }
+    let nameCheckRegex = /^[^@]+$/;
+    const nameIsValid = nameCheckRegex.test(name);
+    this.setState({ name, nameIsValid });
+  };
 
   private noop = () => {
     // do nothing
@@ -45,14 +49,16 @@ export default class CompleteSignInProfilePage extends React.Component<HomePageP
           <Modal.Header>Complete your profile</Modal.Header>
           <Modal.Content>
             <p>Because this is your first sign in, please enter your name.</p>
+            <p>Please <strong>do not</strong> use an email address as your name.</p>
             <Form error={this.state.error}>
               <Input
                 field="name"
                 onChange={this.setName}
                 maxLength={100}
                 placeholder="Name"
+                pattern="^[^@]+$" 
                 suffix={
-                  <Button type="submit" onClick={this.submit} color="positive" disabled={this.state.name === ""}>
+                  <Button type="submit" onClick={this.submit} color="positive" disabled={this.state.name === "" || !this.state.nameIsValid}>
                     Submit
                   </Button>
                 }

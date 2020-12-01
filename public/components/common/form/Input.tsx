@@ -5,23 +5,24 @@ import { DisplayError, hasError } from "./DisplayError"
 import { IconType } from "react-icons"
 
 interface InputProps {
-  field: string
-  label?: string
-  className?: string
-  autoComplete?: string
-  autoFocus?: boolean
-  noTabFocus?: boolean
-  afterLabel?: JSX.Element
-  icon?: IconType
-  maxLength?: number
-  value?: string
-  disabled?: boolean
-  suffix?: string | JSX.Element
-  placeholder?: string
-  onIconClick?: () => void
-  onFocus?: () => void
-  inputRef?: React.MutableRefObject<any>
-  onChange?: (value: string) => void
+  field: string;
+  label?: string;
+  className?: string;
+  autoComplete?: string;
+  autoFocus?: boolean;
+  noTabFocus?: boolean;
+  afterLabel?: JSX.Element;
+  icon?: IconType;
+  maxLength?: number;
+  value?: string;
+  disabled?: boolean;
+  suffix?: string | JSX.Element;
+  placeholder?: string;
+  onIconClick?: () => void;
+  onFocus?: () => void;
+  inputRef?: React.MutableRefObject<any>;
+  onChange?: (value: string) => void;
+  pattern?: string;
 }
 
 export const Input: React.FunctionComponent<InputProps> = (props) => {
@@ -39,6 +40,10 @@ export const Input: React.FunctionComponent<InputProps> = (props) => {
         className: classSet({ link: !!props.onIconClick }),
       })
     : undefined
+
+  const pattern = !!props.pattern
+    ? props.pattern
+    : "(?s).*";
 
   return (
     <ValidationContext.Consumer>
@@ -72,6 +77,7 @@ export const Input: React.FunctionComponent<InputProps> = (props) => {
               value={props.value}
               placeholder={props.placeholder}
               onChange={onChange}
+              pattern={pattern}
             />
             {icon}
             {suffix}
