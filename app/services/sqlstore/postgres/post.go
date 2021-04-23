@@ -438,13 +438,15 @@ func querySinglePost(ctx context.Context, trx *dbx.Trx, query string, args ...in
 }
 
 func buildPostQuery(user *models.User, filter string) string {
-	tagCondition := `AND tags.is_public = true`
+	// Only show posts tagged public AND posts by users whose posts aren't default-hidden
+	// ... but also show a hidden-posts user their own posts.
+	visibilityCondition := fmt.Sprintf(`AND tags.is_public = true AND (u.status < %d OR u.id = %d)`, enum.UserActive, user.ID)
 	if user != nil && user.IsCollaborator() {
-		tagCondition = ``
+		visibilityCondition = ``
 	}
 	hasVotedSubQuery := "null"
 	if user != nil {
 		hasVotedSubQuery = fmt.Sprintf("(SELECT true FROM post_votes WHERE post_id = p.id AND user_id = %d)", user.ID)
 	}
-	return fmt.Sprintf(sqlSelectPostsWhere, tagCondition, hasVotedSubQuery, filter)
+	return fmt.Sprintf(sqlSelectPostsWhere, visibilityCondition, hasVotedSubQuery, filter)
 }

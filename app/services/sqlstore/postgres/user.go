@@ -103,6 +103,30 @@ func unblockUser(ctx context.Context, c *cmd.UnblockUser) error {
 	})
 }
 
+func approveUser(ctx context.Context, c *cmd.ApproveUser) error {
+	return using(ctx, func(trx *dbx.Trx, tenant *models.Tenant, user *models.User) error {
+		if _, err := trx.Execute(
+			"UPDATE users SET status = $3 WHERE id = $1 AND tenant_id = $2",
+			c.UserID, tenant.ID, enum.UserApproved,
+		); err != nil {
+			return errors.Wrap(err, "failed to approve user")
+		}
+		return nil
+	})
+}
+
+func unApproveUser(ctx context.Context, c *cmd.ApproveUser) error {
+	return using(ctx, func(trx *dbx.Trx, tenant *models.Tenant, user *models.User) error {
+		if _, err := trx.Execute(
+			"UPDATE users SET status = $3 WHERE id = $1 AND tenant_id = $2",
+			c.UserID, tenant.ID, enum.UserActive,
+		); err != nil {
+			return errors.Wrap(err, "failed to unapprove user")
+		}
+		return nil
+	})
+}
+
 func deleteCurrentUser(ctx context.Context, c *cmd.DeleteCurrentUser) error {
 	return using(ctx, func(trx *dbx.Trx, tenant *models.Tenant, user *models.User) error {
 		if _, err := trx.Execute(

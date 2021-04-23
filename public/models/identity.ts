@@ -34,6 +34,7 @@ export enum UserStatus {
   Active = "active",
   Deleted = "deleted",
   Blocked = "blocked",
+  Approved = "approved"
 }
 
 export enum UserRole {
