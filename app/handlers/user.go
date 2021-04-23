@@ -39,3 +39,35 @@ func UnblockUser() web.HandlerFunc {
 		return c.Ok(web.Map{})
 	}
 }
+
+func ApproveUser() web.HandlerFunc {
+	return func(c *web.Context) error {
+		userID, err := c.ParamAsInt("userID")
+		if err != nil {
+			return c.NotFound()
+		}
+
+		err = bus.Dispatch(c, &cmd.ApproveUser{UserID: userID})
+		if err != nil {
+			return c.Failure(err)
+		}
+
+		return c.Ok(web.Map{})
+	}
+}
+
+func UnApproveUser() web.HandlerFunc {
+	return func(c *web.Context) error {
+		userID, err := c.ParamAsInt("userID")
+		if err != nil {
+			return c.NotFound()
+		}
+
+		err = bus.Dispatch(c, &cmd.UnApproveUser{UserID: userID})
+		if err != nil {
+			return c.Failure(err)
+		}
+
+		return c.Ok(web.Map{})
+	}
+}

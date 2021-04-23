@@ -6,6 +6,7 @@ import (
 
 	"github.com/getfider/fider/app/models"
 	"github.com/getfider/fider/app/models/cmd"
+	"github.com/getfider/fider/app/models/enum"
 	"github.com/getfider/fider/app/models/query"
 	"github.com/getfider/fider/app/pkg/dbx"
 	"github.com/getfider/fider/app/pkg/errors"
@@ -183,7 +184,8 @@ func getCommentsByPost(ctx context.Context, q *query.GetCommentsByPost) error {
 			WHERE p.id = $1
 			AND p.tenant_id = $2
 			AND c.deleted_at IS NULL
-			ORDER BY c.created_at ASC`, q.Post.ID, tenant.ID)
+			AND (u.status < $4 OR u.id = $3)
+			ORDER BY c.created_at ASC`, q.Post.ID, tenant.ID, user.ID, enum.UserActive)
 		if err != nil {
 			return errors.Wrap(err, "failed get comments of post with id '%d'", q.Post.ID)
 		}

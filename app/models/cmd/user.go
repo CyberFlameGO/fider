@@ -13,6 +13,14 @@ type UnblockUser struct {
 	UserID int
 }
 
+type ApproveUser struct {
+	UserID int
+}
+
+type UnApproveUser struct {
+	UserID int
+}
+
 type RegenerateAPIKey struct {
 	Result string
 }
