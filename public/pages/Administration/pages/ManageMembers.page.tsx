@@ -112,8 +112,17 @@ export default class ManageMembersPage extends AdminBasePage<ManageMembersPagePr
       this.handleSearchFilterChanged(this.state.query)
     }
 
-    const changeStatus = async (status: UserStatus) => {
+    const toggleBlock = async (status: UserStatus) => {
       const action = status === UserStatus.Blocked ? actions.blockUser : actions.unblockUser
+      const result = await action(user.id)
+      if (result.ok) {
+        user.status = status
+      }
+      this.forceUpdate()
+    }
+
+    const toggleApproval = async (status: UserStatus) => {
+      const action = status === UserStatus.Active ? actions.approveUser : actions.unapproveUser
       const result = await action(user.id)
       if (result.ok) {
         user.status = status
@@ -128,13 +137,13 @@ export default class ManageMembersPage extends AdminBasePage<ManageMembersPagePr
     } else if (actionName === "to-administrator") {
       await changeRole(UserRole.Administrator)
     } else if (actionName === "block") {
-      await changeStatus(UserStatus.Blocked)
+      await toggleBlock(UserStatus.Blocked)
     } else if (actionName === "unblock") {
-      await changeStatus(UserStatus.Active)
+      await toggleBlock(UserStatus.Active)
     } else if (actionName === "to-approved") {
-      await changeStatus(UserStatus.Approved)
+      await toggleApproval(UserStatus.Approved)
     } else if (actionName === "to-active") {
-      await changeStatus(UserStatus.Active)
+      await toggleApproval(UserStatus.Active)
     }
   }
 
