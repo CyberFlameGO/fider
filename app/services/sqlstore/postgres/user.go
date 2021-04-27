@@ -115,7 +115,7 @@ func approveUser(ctx context.Context, c *cmd.ApproveUser) error {
 	})
 }
 
-func unApproveUser(ctx context.Context, c *cmd.ApproveUser) error {
+func unApproveUser(ctx context.Context, c *cmd.UnApproveUser) error {
 	return using(ctx, func(trx *dbx.Trx, tenant *models.Tenant, user *models.User) error {
 		if _, err := trx.Execute(
 			"UPDATE users SET status = $3 WHERE id = $1 AND tenant_id = $2",
