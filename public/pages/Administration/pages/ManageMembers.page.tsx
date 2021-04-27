@@ -122,7 +122,7 @@ export default class ManageMembersPage extends AdminBasePage<ManageMembersPagePr
     }
 
     const toggleApproval = async (status: UserStatus) => {
-      const action = status === UserStatus.Active ? actions.approveUser : actions.unapproveUser
+      const action = status === UserStatus.Approved ? actions.approveUser : actions.unapproveUser
       const result = await action(user.id)
       if (result.ok) {
         user.status = status
