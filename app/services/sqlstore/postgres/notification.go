@@ -195,12 +195,14 @@ func getActiveSubscribers(ctx context.Context, q *query.GetActiveSubscribers) er
 					(set.value IS NULL AND u.role = ANY($3))
 					OR CAST(set.value AS integer) & $4 > 0
 				)
+				AND u.role NOT IN $9
 				ORDER by u.id`,
 				q.Event.UserSettingsKeyName,
 				tenant.ID,
 				pq.Array(q.Event.DefaultEnabledUserRoles),
 				q.Channel,
 				enum.UserActive,
+				pq.Array(q.Event.DisabledSubscriptionRoles),
 			)
 		} else {
 			err = trx.Select(&users, `
@@ -221,6 +223,7 @@ func getActiveSubscribers(ctx context.Context, q *query.GetActiveSubscribers) er
 					(set.value IS NULL AND u.role = ANY($5))
 					OR CAST(set.value AS integer) & $6 > 0
 				)
+				AND u.role NOT IN $9
 				ORDER by u.id`,
 				q.Number,
 				enum.SubscriberActive,
@@ -230,6 +233,7 @@ func getActiveSubscribers(ctx context.Context, q *query.GetActiveSubscribers) er
 				q.Channel,
 				pq.Array(q.Event.RequiresSubscriptionUserRoles),
 				enum.UserActive,
+				pq.Array(q.Event.DisabledSubscriptionRoles),
 			)
 		}
 

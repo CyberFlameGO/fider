@@ -26,6 +26,7 @@ const UserListItem = (props: UserListItemProps) => {
   const admin = props.user.role === UserRole.Administrator && <span className="staff">administrator</span>
   const collaborator = props.user.role === UserRole.Collaborator && <span className="staff">collaborator</span>
   const blocked = props.user.status === UserStatus.Blocked && <span className="blocked">blocked</span>
+  const approved = props.user.status === UserStatus.Approved && <span className="approved">approved</span>
   const isVisitor = props.user.role === UserRole.Visitor
 
   const renderEllipsis = () => {
@@ -42,7 +43,7 @@ const UserListItem = (props: UserListItemProps) => {
       <div className="l-user-details">
         <UserName user={props.user} />
         <span>
-          {admin} {collaborator} {blocked}
+          {admin} {collaborator} {blocked} {approved}
         </span>
       </div>
       {Fider.session.user.id !== props.user.id && Fider.session.user.isAdministrator && (
@@ -52,6 +53,8 @@ const UserListItem = (props: UserListItemProps) => {
           highlightSelected={false}
           style="simple"
           items={[
+            !blocked && (isVisitor && !approved) && { label: "Approve User", value: "to-approved" },
+            !blocked && (isVisitor && !!approved) && { label: "Un-approve User", value: "to-active" },
             !blocked && (!!collaborator || isVisitor) && { label: "Promote to Administrator", value: "to-administrator" },
             !blocked && (!!admin || isVisitor) && { label: "Promote to Collaborator", value: "to-collaborator" },
             !blocked && (!!collaborator || !!admin) && { label: "Demote to Visitor", value: "to-visitor" },
@@ -109,8 +112,17 @@ export default class ManageMembersPage extends AdminBasePage<ManageMembersPagePr
       this.handleSearchFilterChanged(this.state.query)
     }
 
-    const changeStatus = async (status: UserStatus) => {
+    const toggleBlock = async (status: UserStatus) => {
       const action = status === UserStatus.Blocked ? actions.blockUser : actions.unblockUser
+      const result = await action(user.id)
+      if (result.ok) {
+        user.status = status
+      }
+      this.forceUpdate()
+    }
+
+    const toggleApproval = async (status: UserStatus) => {
+      const action = status === UserStatus.Approved ? actions.approveUser : actions.unapproveUser
       const result = await action(user.id)
       if (result.ok) {
         user.status = status
@@ -125,9 +137,13 @@ export default class ManageMembersPage extends AdminBasePage<ManageMembersPagePr
     } else if (actionName === "to-administrator") {
       await changeRole(UserRole.Administrator)
     } else if (actionName === "block") {
-      await changeStatus(UserStatus.Blocked)
+      await toggleBlock(UserStatus.Blocked)
     } else if (actionName === "unblock") {
-      await changeStatus(UserStatus.Active)
+      await toggleBlock(UserStatus.Active)
+    } else if (actionName === "to-approved") {
+      await toggleApproval(UserStatus.Approved)
+    } else if (actionName === "to-active") {
+      await toggleApproval(UserStatus.Active)
     }
   }
 

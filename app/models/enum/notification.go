@@ -20,6 +20,7 @@ type NotificationEvent struct {
 	DefaultSettingValue           string
 	RequiresSubscriptionUserRoles []Role
 	DefaultEnabledUserRoles       []Role
+	DisabledSubscriptionRoles     []Role
 	Validate                      func(string) bool
 }
 
@@ -37,6 +38,9 @@ var (
 			RoleAdministrator,
 			RoleCollaborator,
 		},
+		DisabledSubscriptionRoles: []Role{
+			RoleVisitor,
+		},
 		Validate: notificationEventValidation,
 	}
 	//NotificationEventNewComment is triggered when a new comment is posted
@@ -49,6 +53,9 @@ var (
 		DefaultEnabledUserRoles: []Role{
 			RoleAdministrator,
 			RoleCollaborator,
+		},
+		DisabledSubscriptionRoles: []Role{
+			RoleVisitor,
 		},
 		Validate: notificationEventValidation,
 	}
