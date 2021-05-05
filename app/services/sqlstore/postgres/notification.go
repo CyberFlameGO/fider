@@ -195,7 +195,7 @@ func getActiveSubscribers(ctx context.Context, q *query.GetActiveSubscribers) er
 					(set.value IS NULL AND u.role = ANY($3))
 					OR CAST(set.value AS integer) & $4 > 0
 				)
-				AND u.role NOT IN $9
+				AND u.role != ANY($6)
 				ORDER by u.id`,
 				q.Event.UserSettingsKeyName,
 				tenant.ID,
@@ -223,7 +223,7 @@ func getActiveSubscribers(ctx context.Context, q *query.GetActiveSubscribers) er
 					(set.value IS NULL AND u.role = ANY($5))
 					OR CAST(set.value AS integer) & $6 > 0
 				)
-				AND u.role NOT IN $9
+				AND u.role != ANY($9)
 				ORDER by u.id`,
 				q.Number,
 				enum.SubscriberActive,
