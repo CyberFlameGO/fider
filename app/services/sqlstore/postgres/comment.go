@@ -134,9 +134,14 @@ func getCommentsByPost(ctx context.Context, q *query.GetCommentsByPost) error {
 	return using(ctx, func(trx *dbx.Trx, tenant *models.Tenant, user *models.User) error {
 		q.Result = make([]*models.Comment, 0)
 
-		comments := []*dbComment{}
-		err := trx.Select(&comments,
-			`WITH agg_attachments AS ( 
+		banFilter := ""
+		if user != nil && !user.IsCollaborator() {
+			banFilter = fmt.Sprintf(`AND (u.status < %d OR u.id = %d)`, enum.UserActive, user.ID)
+		} else {
+			banFilter = fmt.Sprintf(`AND (u.status < %d)`, enum.UserActive)
+		}
+
+		query := fmt.Sprintf(`WITH agg_attachments AS ( 
 					SELECT 
 							c.id as comment_id, 
 							ARRAY_REMOVE(ARRAY_AGG(at.attachment_bkey), NULL) as attachment_bkeys
@@ -184,8 +189,12 @@ func getCommentsByPost(ctx context.Context, q *query.GetCommentsByPost) error {
 			WHERE p.id = $1
 			AND p.tenant_id = $2
 			AND c.deleted_at IS NULL
-			AND (u.status < $4 OR u.id = $3)
-			ORDER BY c.created_at ASC`, q.Post.ID, tenant.ID, user.ID, enum.UserActive)
+			%s
+			ORDER BY c.created_at ASC`, banFilter)
+
+		comments := []*dbComment{}
+		err := trx.Select(&comments,
+			query, q.Post.ID, tenant.ID)
 		if err != nil {
 			return errors.Wrap(err, "failed get comments of post with id '%d'", q.Post.ID)
 		}
