@@ -21,5 +21,7 @@ require (
 	github.com/russross/blackfriday v1.6.0
 	golang.org/x/crypto v0.0.0-20210220033148-5ea612d1eb83
 	golang.org/x/oauth2 v0.0.0-20210220000619-9bb904979d93
+	golang.org/x/sys v0.0.0-20210511113859-b0526f3d8744 // indirect
+	golang.org/x/tools v0.1.1 // indirect
 	rogchap.com/v8go v0.5.1
 )
